@@ -3,6 +3,7 @@
 session_start();
 
 require_once 'config/database.php';
+require_once 'includes/product_validation.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: index.php');
@@ -28,7 +29,7 @@ if (
     exit;
 }
 
-if (!is_numeric($price) || $price < 0) {
+if (!isValidProductPrice($price)) {
     $_SESSION['error'] = 'Harga produk tidak valid.';
 
     header('Location: index.php');

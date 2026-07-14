@@ -1,7 +1,9 @@
 <?php
 
+session_start();
+
 require_once 'config/database.php';
-require_once 'includes/header.php';
+require_once 'includes/product_validation.php';
 
 $id = $_GET['id'] ?? '';
 
@@ -62,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     ) {
         $_SESSION['error'] = 'Semua field wajib diisi.';
 
-    } elseif (!is_numeric($price) || $price < 0) {
+    } elseif (!isValidProductPrice($price)) {
 
         $_SESSION['error'] = 'Harga produk tidak valid.';
 
@@ -114,6 +116,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $product['stock'] = $stock;
     $product['supplier'] = $supplier;
 }
+
+require_once 'includes/header.php';
 
 ?>
 

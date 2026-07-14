@@ -2,7 +2,7 @@
 session_start();
 
 require_once 'config/database.php';
-require_once 'includes/header.php';
+require_once 'includes/product_validation.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     $_SESSION['error'] = 'Akses tidak valid.';
@@ -50,6 +50,10 @@ if (!$handle) {
 
 $header = fgetcsv($handle);
 
+if (is_array($header)) {
+    $header[0] = preg_replace('/^\xEF\xBB\xBF/', '', $header[0] ?? '');
+}
+
 $expected = [
     'product_name',
     'category',
@@ -70,24 +74,45 @@ if ($header !== $expected) {
 }
 
 $products = [];
+$error = '';
+$rowNumber = 1;
 
 while (($row = fgetcsv($handle)) !== false) {
+    $rowNumber++;
 
-    if (count($row) < 5) {
+    if ($row === [null]) {
         continue;
     }
 
-    $products[] = [
+    if (count($row) !== 5) {
+        $error = "Baris $rowNumber CSV harus memiliki 5 kolom.";
+        break;
+    }
+
+    $product = [
         'product_name' => trim($row[0]),
         'category' => trim($row[1]),
         'price' => trim($row[2]),
         'stock' => trim($row[3]),
         'supplier' => trim($row[4])
     ];
+
+    if (!isValidProductData($product)) {
+        $error = "Data pada baris $rowNumber CSV tidak valid.";
+        break;
+    }
+
+    $products[] = $product;
 }
 
 fclose($handle);
 unlink($tempFile);
+
+if ($error !== '') {
+    $_SESSION['error'] = $error;
+    header('Location: index.php');
+    exit;
+}
 
 if (count($products) === 0) {
     $_SESSION['error'] = 'Tidak ada data yang dapat diimport.';
@@ -96,6 +121,8 @@ if (count($products) === 0) {
 }
 
 $_SESSION['csv_products'] = $products;
+
+require_once 'includes/header.php';
 ?>
 
 <div class="row justify-content-center">

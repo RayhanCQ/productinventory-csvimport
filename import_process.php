@@ -3,6 +3,7 @@
 session_start();
 
 require_once 'config/database.php';
+require_once 'includes/product_validation.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     $_SESSION['error'] = 'Akses tidak valid.';
@@ -47,26 +48,10 @@ try {
 
     $statement = $pdo->prepare($query);
 
-    $success = 0;
-
     foreach ($products as $product) {
 
-        if (
-            trim($product['product_name']) === '' ||
-            trim($product['category']) === '' ||
-            trim($product['supplier']) === ''
-        ) {
-            continue;
-        }
-
-        if (!is_numeric($product['price'])) {
-            continue;
-        }
-
-        if (
-            filter_var($product['stock'], FILTER_VALIDATE_INT) === false
-        ) {
-            continue;
+        if (!isValidProductData($product)) {
+            throw new RuntimeException('Data CSV tidak valid.');
         }
 
         $statement->execute([
@@ -76,22 +61,21 @@ try {
             ':stock'        => $product['stock'],
             ':supplier'     => trim($product['supplier'])
         ]);
-
-        $success++;
     }
 
     $pdo->commit();
 
     unset($_SESSION['csv_products']);
 
-    $_SESSION['success'] = $success . ' produk berhasil diimport.';
+    $_SESSION['success'] = count($products) . ' produk berhasil diimport.';
 
-} catch (PDOException $e) {
+} catch (Throwable $e) {
 
     if ($pdo->inTransaction()) {
         $pdo->rollBack();
     }
 
+    unset($_SESSION['csv_products']);
     $_SESSION['error'] = 'Import CSV gagal.';
 }
 
