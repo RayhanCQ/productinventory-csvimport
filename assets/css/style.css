@@ -1,0 +1,123 @@
+/* =========================
+   Product Inventory Theme
+   ========================= */
+
+:root{
+    --primary:#1B4332;
+    --primary-dark:#163A2C;
+    --navbar:#081C15;
+    --bg:#F8F9FA;
+    --border:#DEE2E6;
+    --text:#212529;
+}
+
+body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+
+.navbar{
+    background:var(--navbar)!important;
+}
+
+.navbar-brand{
+    font-weight:700;
+    letter-spacing:.3px;
+}
+
+.card{
+    border:1px solid var(--border);
+    border-radius:14px;
+    box-shadow:0 8px 20px rgba(0,0,0,.06);
+}
+
+.card-title{
+    color:var(--primary);
+}
+
+.form-label{
+    font-weight:600;
+}
+
+.form-control{
+    border-radius:10px;
+    padding:.65rem .85rem;
+}
+
+.form-control:focus{
+    border-color:var(--primary);
+    box-shadow:0 0 0 .2rem rgba(27,67,50,.18);
+}
+
+.btn{
+    border-radius:10px;
+    font-weight:600;
+}
+
+.btn-primary,
+.btn-success{
+    background:var(--primary);
+    border-color:var(--primary);
+}
+
+.btn-primary:hover,
+.btn-success:hover{
+    background:var(--primary-dark);
+    border-color:var(--primary-dark);
+}
+
+.btn-outline-dark{
+    color:var(--primary);
+    border-color:var(--primary);
+}
+
+.btn-outline-dark:hover{
+    background:var(--primary);
+    border-color:var(--primary);
+    color:#fff;
+}
+
+.table-dark{
+    --bs-table-bg: var(--primary);
+    --bs-table-border-color: var(--primary);
+}
+
+.table tbody tr:hover{
+    background:#eef6f1;
+}
+
+code{
+    color:var(--primary);
+    font-weight:600;
+}
+
+.alert{
+    border-radius:10px;
+}
+
+footer{
+    background:var(--navbar)!important;
+}
+
+h1,h2,h3,h4,h5{
+    color:var(--primary);
+}
+
+hr{
+    opacity:.12;
+}
+
+@media (max-width:768px){
+    .card{
+        margin-bottom:1rem;
+    }
+
+    .btn{
+        width:100%;
+    }
+
+    .d-flex.gap-2{
+        flex-direction:column;
+    }
+}
