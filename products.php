@@ -190,7 +190,7 @@ try {
                         <thead class="table-dark">
 
                             <tr>
-                                <th>ID</th>
+                                <th>No.</th>
                                 <th>Nama Produk</th>
                                 <th>Kategori</th>
                                 <th>Harga</th>
@@ -206,12 +206,12 @@ try {
 
                             <?php if (count($products) > 0): ?>
 
-                                <?php foreach ($products as $product): ?>
+                                <?php foreach ($products as $index => $product): ?>
 
                                     <tr>
 
                                         <td>
-                                            <?= htmlspecialchars($product['id']); ?>
+                                            <?= $index + 1; ?>
                                         </td>
 
 
