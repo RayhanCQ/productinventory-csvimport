@@ -326,12 +326,12 @@ try {
                                                     </button>
 
 
-                                                    <a
-                                                        href="delete.php?id=<?= $product['id']; ?>"
-                                                        class="btn btn-danger"
-                                                    >
+                                                    <form action="delete.php" method="POST">
+                                                        <input type="hidden" name="id" value="<?= htmlspecialchars($product['id']); ?>">
+                                                        <button type="submit" class="btn btn-danger">
                                                         Ya, Hapus
-                                                    </a>
+                                                        </button>
+                                                    </form>
 
                                                 </div>
 

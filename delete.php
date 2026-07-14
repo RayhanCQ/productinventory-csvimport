@@ -4,7 +4,12 @@ session_start();
 
 require_once 'config/database.php';
 
-$id = $_GET['id'] ?? '';
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header('Location: products.php');
+    exit;
+}
+
+$id = $_POST['id'] ?? '';
 
 if (
     filter_var($id, FILTER_VALIDATE_INT) === false ||
