@@ -1,382 +1,155 @@
 # Product Inventory with CSV Import
 
-Aplikasi web sederhana berbasis **PHP Native** untuk mengelola data produk. Pengguna dapat menambahkan produk secara manual maupun mengimpor banyak produk melalui file CSV. Sebelum data diimpor ke database, sistem akan menampilkan pratinjau isi CSV sehingga pengguna dapat memastikan data yang akan disimpan sudah benar.
+Aplikasi web sederhana berbasis PHP Native untuk mengelola data produk. Produk dapat ditambahkan secara manual atau diimpor melalui CSV dengan tahap preview sebelum disimpan ke database.
 
----
+## Fitur
 
-## 📌 Tujuan Project
+- Tambah produk secara manual
+- Import produk dari file CSV
+- Validasi header dan isi CSV sebelum import
+- Preview data CSV sebelum disimpan
+- Menampilkan dan mencari produk berdasarkan nama atau kategori
+- Edit dan hapus produk
+- Pesan sukses dan error berbasis session
+- Antarmuka responsif menggunakan Bootstrap 5
 
-Project ini dibuat sebagai latihan pengembangan aplikasi CRUD menggunakan PHP Native dengan tambahan fitur import data melalui file CSV. Fokus utama proyek adalah menunjukkan implementasi:
+## Tech stack
 
-* CRUD menggunakan PHP Native
-* Koneksi database menggunakan PDO
-* Upload file menggunakan `multipart/form-data`
-* Parsing file CSV menggunakan `fgetcsv()`
-* Validasi data sebelum disimpan
-* Operasi SQL (*INSERT*, *SELECT*, *UPDATE*, *DELETE*)
-* Menampilkan data menggunakan tabel HTML
-* Organisasi kode sederhana menggunakan struktur folder yang rapi
+- PHP Native 8.x
+- PDO
+- MySQL/MariaDB
+- HTML5, CSS3, dan Vanilla JavaScript
+- Bootstrap 5 melalui CDN
+- XAMPP sebagai web server lokal
 
----
-
-## 📌 Fitur
-
-* Tambah produk secara manual
-* Import produk melalui file CSV
-* Preview data CSV sebelum diimport
-* Menampilkan seluruh data produk dalam tabel
-* Edit data produk
-* Hapus data produk
-* Pencarian produk
-* Notifikasi proses berhasil atau gagal
-* Antarmuka responsif menggunakan Bootstrap 5
-
----
-
-## 🛠️ Tech Stack
-
-### Frontend
-
-* HTML5
-* CSS3
-* Bootstrap 5 (CDN)
-* Vanilla JavaScript
-
-### Backend
-
-* PHP Native 8.x
-* PDO (*PHP Data Objects*)
-
-### Database
-
-* MySQL / MariaDB
-
-### Web Server
-
-* XAMPP
-
----
-
-## 📁 Struktur Folder
+## Struktur folder dan file
 
 ```text
-product-inventory/
-
-│
+productinventory-csvimport/
 ├── assets/
-│   ├── css/
-│   │     style.css
-│   └── img/
-│
+│   └── css/
+│       └── style.css              # Tema dan styling tambahan aplikasi
 ├── config/
-│     database.php
-│
-├── uploads/
-│
+│   └── database.php                # Koneksi PDO ke database
 ├── includes/
-│     header.php
-│     footer.php
-│
-├── index.php
-├── products.php
-├── edit.php
-├── delete.php
-├── save.php
-├── preview_import.php
-├── import_process.php
-└── sample.csv
+│   ├── footer.php                  # Footer, Bootstrap JavaScript, dan penutup HTML
+│   ├── header.php                  # Session, navbar, Bootstrap CSS, dan pembuka HTML
+│   └── product_validation.php      # Fungsi validasi harga dan data produk
+├── tests/
+│   └── product_validation_test.php # Pengujian sederhana fungsi validasi produk
+├── uploads/                        # Penyimpanan sementara file CSV saat preview
+├── delete.php                      # Menghapus produk berdasarkan ID
+├── edit.php                        # Menampilkan dan memproses form edit produk
+├── import_process.php              # Menyimpan hasil preview CSV ke database
+├── index.php                       # Dashboard, form produk manual, dan upload CSV
+├── preview_import.php              # Upload, validasi, dan preview file CSV
+├── products.php                    # Daftar produk dan pencarian
+├── save.php                         # Menyimpan produk baru ke database
+├── sample.csv                       # Contoh format data CSV
+└── README.md                        # Dokumentasi project
 ```
 
----
+Folder `uploads/` digunakan sementara ketika file CSV diproses dan perlu tersedia serta dapat ditulisi oleh web server. File CSV sementara dihapus setelah selesai dibaca.
 
-## 🗄️ Database
+## Detail file utama
 
-### Tabel `products`
+### `index.php`
 
-| Field        | Type                                |
-| ------------ | ----------------------------------- |
-| id           | INT AUTO_INCREMENT PRIMARY KEY      |
-| product_name | VARCHAR(100)                        |
-| category     | VARCHAR(50)                         |
-| price        | DECIMAL(10,2)                       |
-| stock        | INT                                 |
-| supplier     | VARCHAR(100)                        |
-| created_at   | TIMESTAMP DEFAULT CURRENT_TIMESTAMP |
+Menampilkan dashboard dengan form tambah produk manual, form upload CSV, format header CSV yang diharapkan, serta tautan ke daftar produk.
 
----
+### `save.php`
 
-## 📄 Halaman Aplikasi
+Memvalidasi input produk manual menggunakan `includes/product_validation.php`, lalu menyimpannya ke tabel `products` menggunakan prepared statement PDO.
 
-### 1. Dashboard / Tambah Produk
+### `preview_import.php`
 
-Halaman utama yang menyediakan dua metode input data.
+Memastikan request dan upload valid, memeriksa ekstensi serta header CSV, membaca setiap baris dengan `fgetcsv()`, memvalidasi data produk, lalu menyimpan hasil yang valid ke session untuk ditampilkan sebagai preview.
 
-#### Tambah Produk Manual
+### `import_process.php`
 
-Field yang tersedia:
+Mengambil produk dari session setelah pengguna menyetujui preview dan memasukkan seluruh data ke tabel `products` dalam transaksi database.
 
-* Nama Produk
-* Kategori
-* Harga
-* Stok
-* Supplier
+### `products.php`
 
-Tombol:
+Mengambil daftar produk, mendukung pencarian berdasarkan nama atau kategori, dan menyediakan tombol edit serta delete.
 
-* **Simpan Produk**
+### `edit.php`
 
----
+Mengambil produk berdasarkan ID, menampilkan form edit, memvalidasi perubahan, dan memperbarui data di database.
 
-#### Import Produk CSV
+### `delete.php`
 
-Pengguna dapat memilih file CSV kemudian melakukan proses pratinjau sebelum data disimpan.
+Memvalidasi ID dari request POST, memastikan produk tersedia, lalu menghapusnya dari database.
 
-Tombol:
+### `includes/product_validation.php`
 
-* **Choose File**
-* **Preview CSV**
+Berisi fungsi bersama untuk memvalidasi harga maksimal `99999999.99`, stok bilangan bulat tidak negatif, serta field produk yang wajib diisi. Fungsi ini digunakan oleh proses tambah, edit, dan import CSV.
 
-Navigasi:
+### `tests/product_validation_test.php`
 
-* **Lihat Semua Produk**
+Berisi assertion sederhana untuk memeriksa data valid, harga negatif atau berformat tidak valid, dan stok negatif.
 
----
+## Format CSV
 
-### 2. Preview CSV
-
-Setelah pengguna memilih file CSV dan menekan tombol **Preview CSV**, sistem akan:
-
-* Memvalidasi file
-* Membaca isi file menggunakan `fgetcsv()`
-* Menampilkan seluruh isi CSV dalam bentuk tabel
-* Menampilkan jumlah data yang akan diimport
-
-Contoh tampilan:
-
-| No | Nama Produk       | Kategori   | Harga  | Stok | Supplier |
-| -- | ----------------- | ---------- | ------ | ---- | -------- |
-| 1  | Keyboard Logitech | Elektronik | 250000 | 15   | Logitech |
-| 2  | Mouse Gaming      | Elektronik | 150000 | 40   | Rexus    |
-| 3  | Speaker JBL       | Audio      | 600000 | 5    | JBL      |
-
-Di bagian bawah tersedia tombol:
-
-* **Import ke Database**
-* **Batal**
-
-Apabila proses import berhasil, sistem akan menampilkan notifikasi seperti:
-
-```
-✓ 3 produk berhasil diimport.
-```
-
-Kemudian pengguna akan diarahkan ke halaman **Daftar Produk**.
-
----
-
-### 3. Daftar Produk
-
-Halaman ini menampilkan seluruh data produk dalam bentuk tabel.
-
-Fitur:
-
-* Menampilkan semua data
-* Pencarian berdasarkan nama produk atau kategori
-* Tombol Edit
-* Tombol Delete
-
-Contoh struktur tabel:
-
-| ID | Nama Produk | Kategori   | Harga  | Stok | Supplier | Aksi          |
-| -- | ----------- | ---------- | ------ | ---- | -------- | ------------- |
-| 1  | Keyboard    | Elektronik | 250000 | 15   | Logitech | Edit • Delete |
-| 2  | Mouse       | Elektronik | 150000 | 40   | Rexus    | Edit • Delete |
-
----
-
-### 4. Edit Produk
-
-Halaman untuk memperbarui data produk.
-
-Field yang dapat diubah:
-
-* Nama Produk
-* Kategori
-* Harga
-* Stok
-* Supplier
-
-Tombol:
-
-* **Update**
-
----
-
-### 5. Delete Produk
-
-Penghapusan data dilakukan melalui tombol **Delete** pada halaman daftar produk.
-
-Sebelum data dihapus, sistem akan menampilkan konfirmasi menggunakan Bootstrap Modal.
-
-Contoh:
-
-```
-Apakah Anda yakin ingin menghapus produk ini?
-
-[Ya]
-[Tidak]
-```
-
----
-
-## 🔄 Alur Sistem
-
-```text
-                 Dashboard
-
-                      │
-
-        ┌─────────────┴─────────────┐
-
-        │                           │
-
- Tambah Manual                 Import CSV
-
-        │                           │
-
-        │                    Upload File
-
-        │                           │
-
-        │                     Preview CSV
-
-        │                           │
-
-        │                  Import ke Database
-
-        └─────────────┬─────────────┘
-
-                      │
-
-               Data Produk
-
-                      │
-
-          ┌───────────┴───────────┐
-
-          │                       │
-
-        Edit                   Delete
-```
-
----
-
-## 📄 Contoh Format CSV
+Header CSV harus sama persis dengan format berikut:
 
 ```csv
 product_name,category,price,stock,supplier
 Keyboard Logitech,Elektronik,250000,15,Logitech
 Mouse Gaming,Elektronik,150000,40,Rexus
 Speaker JBL,Audio,600000,5,JBL
-Headset HyperX,Audio,950000,8,HyperX
-Flashdisk Sandisk,Penyimpanan,120000,25,Sandisk
 ```
 
----
+Harga menggunakan angka dengan maksimal dua angka desimal. Stok harus berupa bilangan bulat nol atau lebih.
 
-## ⚙️ Pembagian Proses Backend
+## Database
 
-### `index.php`
+Buat database bernama `inventory_db`, lalu buat tabel `products` dengan struktur berikut:
 
-* Menampilkan form tambah produk
-* Menampilkan form upload CSV
+| Field | Type |
+| --- | --- |
+| `id` | `INT AUTO_INCREMENT PRIMARY KEY` |
+| `product_name` | `VARCHAR(100)` |
+| `category` | `VARCHAR(50)` |
+| `price` | `DECIMAL(10,2)` |
+| `stock` | `INT` |
+| `supplier` | `VARCHAR(100)` |
+| `created_at` | `TIMESTAMP DEFAULT CURRENT_TIMESTAMP` |
 
----
+Konfigurasi default koneksi ada di `config/database.php`:
 
-### `save.php`
-
-* Memproses penyimpanan data produk secara manual ke database
-
----
-
-### `preview_import.php`
-
-Bertugas untuk:
-
-* Memvalidasi file CSV
-* Membaca data menggunakan `fgetcsv()`
-* Menampilkan preview data
-* Menyimpan hasil parsing sementara menggunakan *session* atau *hidden input*
-
----
-
-### `import_process.php`
-
-Bertugas untuk:
-
-* Mengambil data hasil preview
-* Menyimpan seluruh data ke tabel `products`
-* Menampilkan notifikasi hasil import
-
----
-
-### `products.php`
-
-Bertugas untuk:
-
-* Menampilkan seluruh data produk
-* Menyediakan fitur pencarian sederhana menggunakan parameter `GET`
-
----
-
-### `edit.php`
-
-Bertugas untuk:
-
-* Mengambil data berdasarkan ID
-* Menampilkan form edit
-* Menyimpan perubahan ke database
-
----
-
-### `delete.php`
-
-Bertugas untuk:
-
-* Menghapus data produk berdasarkan ID
-* Mengembalikan pengguna ke halaman daftar produk setelah proses selesai
-
----
-
-## ▶️ Cara Menjalankan Project
-
-1. Install XAMPP.
-2. Jalankan **Apache** dan **MySQL**.
-3. Clone atau salin project ke folder:
-
-```text
-htdocs/simple-product-manager
+```php
+$host = 'localhost';
+$dbname = 'inventory_db';
+$username = 'root';
+$password = '';
 ```
 
-4. Buat database baru dengan nama:
+Sesuaikan nilainya jika konfigurasi MySQL lokal berbeda.
 
-```text
-inventory_db
+## Menjalankan project
+
+1. Install dan jalankan Apache serta MySQL melalui XAMPP.
+2. Letakkan project di dalam folder `htdocs`, misalnya:
+
+   ```text
+   htdocs/productinventory-csvimport
+   ```
+
+3. Buat database dan tabel `products` sesuai bagian **Database**.
+4. Sesuaikan koneksi di `config/database.php` jika diperlukan.
+5. Buka aplikasi melalui:
+
+   ```text
+   http://localhost/productinventory-csvimport/
+   ```
+
+## Menjalankan test
+
+Dari root project, jalankan:
+
+```bash
+php tests/product_validation_test.php
 ```
 
-5. Import file SQL yang disediakan.
-
-6. Sesuaikan konfigurasi database pada:
-
-```text
-config/database.php
-```
-
-7. Buka browser dan akses:
-
-```text
-http://localhost/simple-product-manager
-
-```
-
----
+Jika tidak ada output atau error, assertion validasi berhasil dijalankan.
